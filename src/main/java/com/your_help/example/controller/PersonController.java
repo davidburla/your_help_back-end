@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.transaction.Transactional;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://proiect-api-demo.com:3000")
 @RestController
 @RequestMapping("/api/v1/")
 public class PersonController {
