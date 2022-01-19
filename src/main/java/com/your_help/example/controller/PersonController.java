@@ -1,58 +1,55 @@
 package com.your_help.example.controller;
 
-import com.your_help.example.model.Person;
+import com.your_help.example.model.Person.Person;
+import com.your_help.example.model.Person.PersonDto;
 import com.your_help.example.repository.PersonsRepository;
 import com.your_help.example.exception.ResourceNotFoundException;
+import com.your_help.example.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
-@CrossOrigin(origins = "http://proiect-api-demo.com:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/v1/")
 public class PersonController {
     @Autowired
-    private PersonsRepository personsRepository;
+    private PersonService personService;
 
+    @Autowired
+    public PersonController(PersonService personService)
+    {
+        this.personService = personService;
+    }
     // get all persons
     @GetMapping("/persons")
-    public List<Person> getAllPersons()
+    public ResponseEntity<List<PersonDto>> getAllPersons()
     {
-        return personsRepository.findAll();
+        return ResponseEntity.ok(personService.getAll());
     }
 
     //create person rest api
-    @PostMapping("/persons")
-    public Person createPerson(@RequestBody Person person)
+    @PostMapping(path = "/persons", produces = MediaType.APPLICATION_JSON_VALUE)
+    public  ResponseEntity<PersonDto> createPerson(@RequestBody PersonDto person)
     {
-        return personsRepository.save(person);
+        return ResponseEntity.ok(personService.create(person));
     }
 
     // get person by id rest api
-    @GetMapping("/persons/{id}")
-    public ResponseEntity<Person> getPersonById(@PathVariable Integer id)
+    @GetMapping(path = "/persons/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PersonDto> getPersonById(@PathVariable("id") Integer id)
     {
-        Person person = personsRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Person not exist with id: " + id));
-        return ResponseEntity.ok(person);
+        return ResponseEntity.ok(personService.getById(id));
     }
 
     // update person rest api
-    @PutMapping("/persons/{id}")
-    public ResponseEntity<Person> updatePerson(@PathVariable Integer id, @RequestBody Person personDetails)
+    @PutMapping(path = "/persons/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PersonDto> updatePerson(@PathVariable Integer id, @RequestBody PersonDto dto)
     {
-        Person person = personsRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Person not exist with id: " + id));
-        person.setNume(personDetails.getNume());
-        person.setPrenume(personDetails.getPrenume());
-        person.setEmail(personDetails.getEmail());
-        person.setPassword(personDetails.getPassword());
-        person.setTelefon(personDetails.getTelefon());
-
-        Person updatePerson = personsRepository.save(person);
-        return ResponseEntity.ok(updatePerson);
+        System.out.println(dto);
+        return ResponseEntity.ok(personService.update(dto));
     }
 }
