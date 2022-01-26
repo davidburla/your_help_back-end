@@ -75,4 +75,19 @@ public class OfferService {
                 })
                 .orElseThrow(EntityNotFoundException::new);
     }
+
+    @Caching(evict = {
+            @CacheEvict(value = "all_offer_valid", allEntries = true),
+            @CacheEvict(value = "offer_by_id", key="#offerDto.offerId")
+    })
+    public OfferDto update(@NotNull OfferDto offerDto)
+    {
+        return offerRepository
+                .findById(offerDto.getOfferId())
+                .map(result -> {
+                    Offer toBeUpdated = modelMapper.map(offerDto, Offer.class);
+                    return modelMapper.map(offerRepository.save(toBeUpdated), OfferDto.class);
+                })
+                .orElseThrow(EntityNotFoundException::new);
+    }
 }

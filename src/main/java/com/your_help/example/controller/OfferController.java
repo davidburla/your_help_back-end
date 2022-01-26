@@ -45,4 +45,10 @@ public class OfferController {
     {
         return ResponseEntity.ok(offerService.delete(idOffer));
     }
+
+    @PutMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<OfferDto> updateOffer(@RequestBody OfferDto dto)
+    {
+        return ResponseEntity.ok(offerService.update(dto));
+    }
 }
