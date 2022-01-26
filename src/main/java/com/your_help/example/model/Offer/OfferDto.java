@@ -8,8 +8,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class OfferDto {
-    private Integer id;
+    private Integer offerId;
     private Integer personId;
-    private Integer serviceId;
+    private String name;
+    private Double price;
+    private String category_name;
+    private String description;
+    private String zona;
     private Boolean isValid;
+    private String namePerson;
+    private String prenamePerson;
+    private String emailPerson;
+    private String phonePerson;
 }

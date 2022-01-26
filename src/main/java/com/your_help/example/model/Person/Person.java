@@ -1,9 +1,12 @@
 package com.your_help.example.model.Person;
+import com.your_help.example.model.Favorite.Favorite;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,8 +17,8 @@ public class Person implements Serializable
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+    @Column(name = "personId")
+    private Integer personId;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -34,6 +37,12 @@ public class Person implements Serializable
 
     @Column(name = "location")
     private String location;
+
+    @Column(name = "isDeleted")
+    private Boolean isDeleted = false;
+
+    @OneToMany(mappedBy = "person")
+    private Collection<Favorite> favorites;
 
 }
 

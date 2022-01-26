@@ -4,8 +4,12 @@ import com.your_help.example.model.Person.Person;
 import com.your_help.example.model.Person.PersonDto;
 import com.your_help.example.repository.PersonsRepository;
 
+import org.hibernate.annotations.Cache;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityNotFoundException;
@@ -24,15 +28,17 @@ public class PersonService {
         this.modelMapper = modelMapper;
     }
 
+    @Cacheable("all_persons")
     public List<PersonDto> getAll()
     {
         return personRepository.
-                findAll()
+                findAllByIsDeletedFalse()
                 .stream()
                 .map(item -> modelMapper.map(item, PersonDto.class))
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "person_by_id", key="#id")
     public PersonDto getById(Integer id)
     {
         return personRepository
@@ -41,19 +47,39 @@ public class PersonService {
                 .orElseThrow(EntityNotFoundException::new);
     }
 
+    @CacheEvict(value = "all_persons", allEntries = true)
     public PersonDto create(@NotNull PersonDto dto)
     {
         Person person = modelMapper.map(dto, Person.class);
         return modelMapper.map(personRepository.save(person), PersonDto.class);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "all_persons", allEntries = true),
+            @CacheEvict(value = "person_by_id", key ="#dto.personId")
+    })
     public PersonDto update(@NotNull PersonDto dto)
     {
         return personRepository
-                .findById(dto.getId())
+                .findById(dto.getPersonId())
                 .map(result -> {
                     Person toBeUpdated  = modelMapper.map(dto, Person.class);
                     return modelMapper.map(personRepository.save(toBeUpdated), PersonDto.class);
+                })
+                .orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Caching(evict = {
+            @CacheEvict(value = "all_persons", allEntries = true),
+            @CacheEvict(value = "person_by_id", key ="#id")
+    })
+    public Boolean delete(@NotNull Integer id)
+    {
+        return personRepository.
+                findById(id)
+                .map(result -> {
+                    result.setIsDeleted(true);
+                    return personRepository.save(result).getIsDeleted();
                 })
                 .orElseThrow(EntityNotFoundException::new);
     }

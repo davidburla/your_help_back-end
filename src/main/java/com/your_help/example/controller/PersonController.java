@@ -46,10 +46,15 @@ public class PersonController {
     }
 
     // update person rest api
-    @PutMapping(path = "/persons/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PersonDto> updatePerson(@PathVariable Integer id, @RequestBody PersonDto dto)
+    @PutMapping(path = "/persons", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PersonDto> updatePerson(@RequestBody PersonDto dto)
     {
-        System.out.println(dto);
         return ResponseEntity.ok(personService.update(dto));
+    }
+
+    @DeleteMapping(path = "/persons/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deletePerson(@PathVariable("id") Integer id)
+    {
+        return ResponseEntity.ok(personService.delete(id));
     }
 }

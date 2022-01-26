@@ -1,12 +1,13 @@
 package com.your_help.example.model.Offer;
 
+import com.your_help.example.model.Favorite.Favorite;
 import com.your_help.example.model.Person.Person;
-import com.your_help.example.model.Service.Service;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -14,21 +15,33 @@ import java.io.Serializable;
 @Table(name = "offer")
 public class Offer implements Serializable
 {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="offerId")
+    private Integer offerId;
 
-    @EmbeddedId
-    private OfferId id;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("personId")
-    @JoinColumn(name="personId", nullable = false)
-    Person personId;
+    @Column(name = "price", nullable = false)
+    private Double price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("serviceId")
-    @JoinColumn(name="serviceId", nullable = false)
-    Service serviceId;
+    @Column(name = "category_name", nullable = false)
+    private String category_name;
 
-    @Column(name="isValid")
-    Boolean isValid;
+    @Column(name = "description")
+    private String description;
 
+    @Column(name = "zona")
+    private String zona;
+
+    @Column(name = "isValid")
+    private Boolean isValid = true;
+
+    @ManyToOne
+    @JoinColumn(name="personId", referencedColumnName = "personId", nullable = false)
+    private Person person;
+
+    @OneToMany(mappedBy = "offer")
+    Collection<Favorite> favorites;
 }
